@@ -2,6 +2,14 @@
 """
 Created on Fri Dec  7 13:13:09 2018
 
+Functions to control the Newport controller
+This is a module to control the Newport controller for the 007Mo shutter 2.
+It allows to initialize the controller, send commands, read positions, move motors,
+set velocities, and manage motion status.
+It provides functions to move motors relatively or absolutely, stop motion,
+get current velocities, and initialize motors.
+It also includes functions to read the position of all motors and close the sockets.
+
 @author: AAstolfo
 """
 
@@ -9,12 +17,13 @@ import socket
 import numpy as np
 
 def init():
-    
-    # initialize the Newport controller
-    # make sure the IP is correct
-    
+    # This function initializes the Newport controller by creating sockets for each motor
+    # and setting the initial velocities for the translator and rotator.
+    # It returns a list of sockets for communication with the controller.
+    # Note: Make sure the IP address is correct for your Newport controller.
+
     global NP_sockets
-    
+    # Number of motors
     No_motors = 8
     
     # it creates a socket per motor plus two extra for stop and position reading
@@ -24,6 +33,7 @@ def init():
     host = '192.168.254.254'
     port = 5001    
     
+    # create a list of sockets
     for i in range(0,No_sockets):
         if i == 0:
             tmp = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
