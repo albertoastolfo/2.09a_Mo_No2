@@ -30,7 +30,8 @@ def init():
     No_sockets = No_motors + 2
 
     #host = '192.168.5.254'
-    host = '192.168.254.254'
+    #host = '192.168.254.254'
+    host = '192.168.90.2'
     port = 5001    
     
     # create a list of sockets
