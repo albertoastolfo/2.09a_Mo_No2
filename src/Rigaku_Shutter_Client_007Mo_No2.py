@@ -21,7 +21,7 @@ status_shutter_2 = shutter.get_shutter2_from_state(status)
 #print(status_shutter_1)
 #print(status_shutter_2)
 
-shutter_wanted = 2
+shutter_wanted = 1
 
 initial_status = {
     1: 'open' if status_shutter_1 else 'closed',
@@ -87,14 +87,18 @@ def update_entries(label, shutter_num):
         #print(kv)
         ma = shutter.get_mA_from_state(status)
         #print(ma)
+        vac = shutter.get_vacuum_from_state(status)
+
+
         kv_label.config(text=f"kV: {kv}")
         ma_label.config(text=f"mA: {ma}")
+        vac_label.config(text=f"Vac[mV]: {vac}")
         #print('here')
         
     except Exception as e:
-        kv_label.config(text="kV: Error")
-        ma_label.config(text="mA: Error")
-        #print("Status fetch failed:", e)
+        #kv_label.config(text="kV: Error")
+        #ma_label.config(text="mA: Error")
+        print("Status fetch failed:", e)
 
     root.after(10000, lambda: update_entries(label, shutter_num))
 
@@ -144,6 +148,8 @@ kv_label.pack(pady=5)
 ma_label = tk.Label(root, text="mA: --", font=("Verdana", 12), bg="#f7f9fc", fg="#34495e")
 ma_label.pack(pady=5)
 
+vac_label = tk.Label(root, text="Vacuum: --", font=("Verdana", 8), bg="#f7f9fc", fg="#34495e")
+vac_label.pack(pady=5)
 
 # Button styling function
 def style_button(btn, bg, hover_bg):

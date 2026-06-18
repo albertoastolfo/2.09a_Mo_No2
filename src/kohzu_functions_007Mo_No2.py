@@ -229,11 +229,11 @@ def step2unit(motor):
         #k2 = 0.00048    # step size for SA07A-R2T at 1/20 microstep division [motor2] 
         #k1 = 0.0000206    # step size for SA10A-R2L01 (R2M01) at 1/20 step division [motor1]
         #k2 = 0.00001615   # step size for SA10A-R2L01 (R2B01)   at 1/20 step division [motor2]
-        k1 = 0.001      #       SXA530-R01
-        k2 = 0.00096   #       SA05A-R2G01
-        k3 = 0.0012      #       SXA530-R01
-        k4 = 0.00096     #       ZA04A-W101
-        k5 = 0.0012    #       SA04B-RS02 (1)
+        k1 = 0.001      #       
+        k2 = 0.00096   #       SA07A-RB
+        k3 = 0.0012      #       SA07A-RM
+        k4 = 0.00096     #       SA07A-RB
+        k5 = 0.0012    #       SA07A-RM
         # k6 = 0.00134    #       SA04B-RS02 (2)
         # k7 = 0.001      #       SYA0530-R01 (1)
         # k8 = 0.001      #       SYA0530-R01(2)
