@@ -11,6 +11,7 @@ from dectris.compression import decompress
 import numpy as np
 import argparse, logging, os
 import tifffile,glob
+import os
 
 logging.basicConfig()
 log = logging.getLogger(__name__)
@@ -22,6 +23,18 @@ def parseArgs():
     parser.add_argument("-o", "--outd", help="output file directory", type=str)
     args = parser.parse_args()
     return args
+
+def get_unique_filename(path):
+    base, ext = os.path.splitext(path)
+    counter = 1
+
+    new_path = path
+    while os.path.exists(new_path):
+        new_path = f"{base}_{counter}{ext}"
+        counter += 1
+
+    return new_path
+
 
 def subset_mydecoder_tif(path, output_path, output_name = 'image', stack_average = 0, th_difference = 0):
     
@@ -379,6 +392,125 @@ def decoder_tif(file_in, file_out=None):
                 tifffile.imwrite(imgName, data)
                 log.info(f'wrote {imgName}')
 
+
+def mydecoder_tif(path, output_path, output_name = 'image', stack_average = 0):
+    
+    # to avoid saving one folder inside
+    file_in = path +'\\'
+
+    outDir = output_path
+
+    # this is the default name for the temporary files created in the "E:\EIGER_DATA" folder
+    #filename = 'EIGER-TMP'
+    filename = ''
+
+
+    files=glob.glob(os.path.join(file_in, filename + '*.cbor')) 
+    
+    print(files)
+
+
+    # I cannot find a way to understand if it is dual energy or not in advance...
+    # here I assueme it is not unless otherwise later
+    is_dual_energy = 0
+    
+    if len(files) != 0:
+          
+        No_frames = len(files)-1
+        
+        #matrix = np.zeros((No_frames,512,1028,2))
+        matrix_low = np.zeros((No_frames,512,1028),dtype=np.uintc)
+        matrix_high = np.zeros((No_frames,512,1028),dtype=np.uintc)
+        
+        counter = 0
+        
+        for fname in files:    
+            a=os.path.basename(fname)
+            b=os.path.splitext(a)[0]
+            c=b[:-14]
+            basename=c
+    #    path.basename is filename
+    #    split .cbor
+    #    prefix is _000000_000000: 14
+        
+            # print(a,b,basename)
+        
+            with open(fname, 'rb') as f:
+                message = cbor2.loads(f.read(), tag_hook=tag_hook)
+                
+                # for threshold, data in message["start"].items():
+                #     print(threshold)
+                
+                if message["type"] == "start":
+                    fnametif = f'{basename}_{message["series_id"]:06d}_metaData.tif'
+                elif message["type"] == "image":
+                    fnametif = f'{basename}_{message["series_id"]:06d}_{message["image_id"]:06d}.tif'  
+    #            print(fnametif)
+                path2 = os.path.join(outDir, fnametif)
+                os.makedirs(outDir, exist_ok=True)
+
+            if message["type"] == "image":
+            
+                #g = message["data"].items()
+    #        for channel in message["channels"]:
+                for threshold, data in message["data"].items():
+    #            channel["data"] = decompress_channel_data(channel)  
+    #            thresholds = "_".join(map(str, channel["thresholds"])) 
+                    
+                    #print(threshold[-1])
+                    if threshold[-1] == '1':
+                       matrix_low[counter,:,:] = data 
+                    if threshold[-1] == '2':
+                        is_dual_energy = 1
+                        matrix_high[counter,:,:] = data 
+                        #matrix[counter,:,:,int(threshold[-1])-1] = data
+                    
+                
+                counter = counter + 1
+                    
+                    # imgName = path2.replace('.tif', f'_{threshold}.tif')
+                    # tifffile.imsave(imgName, data)
+                    # log.info(f'wrote {imgName}')        
+
+        # saving the stacks here:
+        
+        
+        # for i in range(2):
+        #     imgName = path2.replace('_metaData.tif', '_threshold_'+str(i+1)+'.tif')
+        #     print(imgName)
+        #     tifffile.imsave(imgName, matrix[:,:,:,i])
+
+        #imgName_low = path2.replace('_metaData.tif', '_threshold_1.tif')#.replace(filename,output_name)
+        #imgName_high = path2.replace('_metaData.tif', '_threshold_2.tif')#.replace(filename,output_name)
+
+        #imgName_low = outDir + '/' + output_name + '_threshold_1.tif'
+        #imgName_high = outDir + '/' + output_name + '_threshold_2.tif'
+
+
+        imgName_low = os.path.join(outDir, output_name + '_Th_1.tif')
+        imgName_high = os.path.join(outDir, output_name + '_Th_2.tif')
+
+        # ensure unique filenames
+        imgName_low = get_unique_filename(imgName_low)
+        imgName_high = get_unique_filename(imgName_high)
+
+
+        #print(imgName_low.replace(filename,output_name))
+        
+
+        if stack_average == 0:
+            tifffile.imsave(imgName_low, matrix_low)
+            if is_dual_energy:
+                tifffile.imsave(imgName_high, matrix_high)
+        else:
+            tifffile.imsave(imgName_low, np.float32(np.average(matrix_low,axis=0)))
+            if is_dual_energy:
+                tifffile.imsave(imgName_high, np.float32(np.average(matrix_high,axis=0)))            
+
+        #return matrix_low
+    
+    else:
+        print('File not found.')
 
 def decoder_tif_khush(file_in, file_out=None, output_name = 'image'):
     

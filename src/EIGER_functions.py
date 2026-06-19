@@ -407,19 +407,19 @@ def snap(output_path, name=None):
     shutter.Close_Shutter()    
 
     
-    ths = get_thresholds()
-    base_name = 'Image_Th1_'+str(ths[0]).replace('.', 'p') + '_Th2_' + str(ths[1]).replace('.', 'p')
+    #ths = get_thresholds()
+    #base_name = 'Image_Th1_'+str(ths[0]).replace('.', 'p') + '_Th2_' + str(ths[1]).replace('.', 'p')
     
-    if name is not None:
-        base_name += f"_{name}"
+    #if name is not None:
+    #    base_name += f"_{name}"
     
     
-    num = len(glob.glob(os.path.join(output_path, "*.tif"))) + 1
-    im_name = f"{base_name}_{num:03d}"
+    #num = len(glob.glob(os.path.join(output_path, "*.tif"))) + 1
+    #im_name = f"{base_name}_{num:03d}"
     
     # c2t.subset_mydecoder_tif(r'D:\EIGER_DATA', output_path,im_name)
     # c2t.decoder_tif(r'D:\EIGER_DATA', output_path)
-    c2t.decoder_tif_khush(r'D:\EIGER_DATA', output_path, im_name)    
+    c2t.mydecoder_tif(r'D:\EIGER_DATA', output_path, name)    
     
     
     file_type = r"\\*tif"  # Replace 'type' with the desired file extension (e.g., '.csv', '.txt')

@@ -78,7 +78,9 @@ class EIGER_GUI(ttk.Frame):
                     EIGER.set_thresholds(float(th1), float(th2))
             #EIGER.set_thresholds(self.ENERGY_THRESHOLDS_display.cget('text'))
 
-            EIGER.snap(path)
+            name = self.IMAGE_NAME_display.cget('text')
+
+            EIGER.snap(path,name)
         else:
             print("Please initialize the detector first by clicking 'INIT'.")
         
@@ -185,6 +187,10 @@ class EIGER_GUI(ttk.Frame):
                 if 0.01 <= check <= 10:
                     out_text.config(text=float(user_entry))
 
+            if out_text == self.IMAGE_NAME_display:
+                out_text.config(text=user_entry)
+
+
         except:
             print('error message')
 
@@ -231,6 +237,14 @@ class EIGER_GUI(ttk.Frame):
                                                                              self.NO_IMAGES_display))
         self.NO_IMAGES_display = ttk.Label(self, text="10")
 
+        self.IMAGE_NAME_label = ttk.Label(self, text="Snap Image Name")
+        self.IMAGE_NAME_entry = ttk.Entry(self)
+        self.IMAGE_NAME_button = ttk.Button(self, text="SET",
+                                           command=lambda: self.update_entry(self.IMAGE_NAME_entry,
+                                                                             self.IMAGE_NAME_display))
+        self.IMAGE_NAME_display = ttk.Label(self, text="Image")
+
+
         # Layout
         self.INIT_RECEIVER_button.grid(row=0, column=0)
         self.INIT_button.grid(row=0, column=1)
@@ -252,6 +266,13 @@ class EIGER_GUI(ttk.Frame):
 
         self.SAVING_PATH_button.grid(row=12, column=0)
         self.SAVING_PATH_display.grid(row=13, column=0, columnspan=3)
+
+        self.IMAGE_NAME_label.grid(row=14, column=0)
+        self.IMAGE_NAME_entry.grid(row=14, column=1)
+        self.IMAGE_NAME_button.grid(row=14, column=2)
+        self.IMAGE_NAME_display.grid(row=15, column=0, columnspan=3)
+
+
 
         self.INIT_LIVE_button.grid(row=0, column=3)
         self.START_LIVE_button.grid(row=1, column=3)
